@@ -1,0 +1,22 @@
+function main(){
+	Number n, k, prod;
+	readln(n);
+	Number[n] v;
+	v := [];
+	k := 0;
+	prod := 1;
+
+	while(k < n){
+		readln(v[k]);
+		k := k + 1;
+	}
+
+	k := 0;
+	while(k < n){
+		prod := prod * v[k];
+		k := k + 1;
+	}
+
+	writeln(prod);
+
+}

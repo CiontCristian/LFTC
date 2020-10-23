@@ -1,0 +1,22 @@
+function main(){
+	Number nr, k;
+	k := 3;
+	Bool isPrime;
+
+	readln(nr);
+	if(nr < 2 or nr == 4){
+		isPrime := false;
+		yield isPrime;
+	}
+	while(k < nr div 2){
+		if(nr mod k == 0){
+			isPrime := false;
+			yield isPrime;
+		}
+		k := k + 1;
+	}
+
+	isPrime := true;
+	yield isPrime;
+
+}

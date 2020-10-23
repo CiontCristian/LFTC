@@ -1,0 +1,14 @@
+function main(){
+	Number x, y, z, min;
+	readln(x);
+	readln(y);
+	readln(z);
+	min := x;
+
+	if(y < min)
+		min := y;
+	if(z < min)
+		min := z;
+
+	writeln(min);
+}
