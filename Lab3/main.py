@@ -78,7 +78,7 @@ def tokenize():
     with open(fileName) as file:
         for line in file:
             line = line.strip()
-            line = re.split('(\[|\]|\{|\}|\(|\)|;|,| )', line)
+            line = re.split('(\[|\]|\{|\}|\(|\)|;|,| |:=|==|<>|<|<=|>|>=|\+|\-|\*|div|mod|and|or|not)', line)
             result.append(line)
 
     return result
