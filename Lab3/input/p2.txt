@@ -1,7 +1,7 @@
 function main(){
 	Number nr, k;
-	k := 3;
-	Bool isPrime;
+	k:=-3;
+	Bool 3isPrime;
 
 	readln(nr);
 	if(nr < 2 or nr == 4){

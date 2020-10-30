@@ -1,4 +1,4 @@
-function main(){
+Afunction main(){
 	Number n, k, prod;
 	readln(n);
 	Number[n] v;

@@ -9,7 +9,7 @@ codification = {}
 operators = []
 separators = []
 reserved = []
-fileName = "input/p1.txt"
+fileName = "input/p2.err"
 
 
 def isOperator(token):
@@ -71,6 +71,8 @@ def writePIF():
     with open("output/pif.out", 'w') as file:
         file.write(str(pif))
 
+def tokenizeByArithmeticOperators(line):
+    return re.split('(\+|-|\*|div|mod|and|or|not)', line)
 
 def tokenize():
     getLanguageSpecs()
@@ -78,11 +80,20 @@ def tokenize():
     with open(fileName) as file:
         for line in file:
             line = line.strip()
-            line = re.split('(\[|\]|\{|\}|\(|\)|;|,| |:=|==|<>|<|<=|>|>=|\+|\-|\*|div|mod|and|or|not)', line)
-            result.append(line)
+            new_line = []
+            line = re.split('(\[|\]|\{|\}|\(|\)|;|,| |:=|==|<>|<|<=|>|>=)', line)
+            print(line)
+            for i in range(len(line)):
+                if line[i] == '-0' or line[i] == '+0':
+                    new_line.append(line[i])
+                elif line[i] not in separators + operators + reserved and not isConstant(line[i]) and not isIdentifier(line[i]):
+                    new_line.extend(tokenizeByArithmeticOperators(line[i]))
+
+                else:
+                    new_line.append(line[i])
+            result.append(new_line)
 
     return result
-
 
 def lexicalAnalysis():
     current_program = tokenize()
@@ -113,7 +124,7 @@ def lexicalAnalysis():
                         pos = st.add(token)
                         pif.add(codification['constant'], pos)
                     else:
-                        raise Exception("Lexical error at line " + str(current_line) + " " + str(line))
+                        raise Exception("Lexical error at line " + str(current_line) + " " + str(line) + " " + "at token: " + token)
         print("Program is lexically correct!")
     except Exception as e:
         print(e)

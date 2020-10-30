@@ -1,10 +1,11 @@
 function main(){
 	Number nr, k;
 	k := 3;
-	Bool 3isPrime;
+	Bool isPrime;
+	zero:=-0;
 
 	readln(nr);
-	if(nr < 2 or nr == 4){
+	if(nr<2 or nr == 4){
 		isPrime := false;
 		yield isPrime;
 	}$
