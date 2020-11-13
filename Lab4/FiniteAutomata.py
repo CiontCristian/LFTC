@@ -31,6 +31,38 @@ class FiniteAutomata:
 
             return FiniteAutomata(Q, E, q0, F, T)
 
+    def checkDeterministic(self):
+        lhs = []
+        for transition in self.T:
+            lhs.append(transition[0])
+
+        counter = Counter(lhs)
+
+        for transition in counter:
+            if counter[transition] > 1:
+                return False
+
+        return True
+
+    def checkAcceptedFA(self, sequence):
+        if self.checkDeterministic():
+            currentState = self.q0
+            foundTransition = True
+            for char in sequence:
+                if not foundTransition:
+                    break
+
+                foundTransition = False
+                for transition in self.T:
+                    if transition[0] == (currentState, char):
+                        currentState = transition[1]
+                        foundTransition = True
+                        break
+
+            print(foundTransition)
+        else:
+            print("FA is not deterministic!")
+
     def printMenu(self):
         print("0.Exit")
         print("1.Display the set of states")
@@ -39,6 +71,8 @@ class FiniteAutomata:
         print("4.Display the final states")
         print("5.Display the initial state")
         print("6.Show everything")
+        print("7.Check if FA is deterministic")
+        print("8.Check if a sequence is accepted by DFA")
 
     def run(self):
         while True:
@@ -59,6 +93,11 @@ class FiniteAutomata:
                     print("q0 = { " + self.q0 + " }\n")
                 elif option == 6:
                     print(self)
+                elif option == 7:
+                    print(self.checkDeterministic())
+                elif option == 8:
+                    sequence = str(input("Enter sequence: (of numbers 0 and 1) "))
+                    self.checkAcceptedFA(sequence)
                 else:
                     raise Exception("Invalid option!")
             except Exception as e:
