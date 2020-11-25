@@ -5,6 +5,15 @@ class Grammar:
         self.S = S
         self.P = P
 
+    def getTerminals(self):
+        return self.E
+
+    def getNonTerminals(self):
+        return self.N
+
+    def getStartingSymbol(self):
+        return self.S
+
     @staticmethod
     def parseLine(line):
         return line.strip().split(' ')[2:]
@@ -23,7 +32,8 @@ class Grammar:
                 [lhs, rhs] = line.strip().split('->')
                 lhs.strip()
                 for token in rhs.strip().split('|'):
-                    P.append((lhs.strip(), token.strip()))
+                    token = list(filter(lambda a: a != '', token.split(' ')))
+                    P.append((lhs.strip(), token))
 
             return Grammar(N, E, S, P)
 
@@ -33,6 +43,15 @@ class Grammar:
         for production in self.P:
             if production[0] == symbol:
                 prods.append(production[1])
+
+        return prods
+
+    def getProductionsContainingNonterminal(self, symbol):
+        prods = []
+
+        for production in self.P:
+            if symbol in production[1]:
+                prods.append(production)
 
         return prods
 

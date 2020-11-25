@@ -1,0 +1,10 @@
+N = S B C D E F
+E = a b c g h f
+S = S
+P =
+    S -> a B D h
+    B -> c C
+    C -> b C | epsilon
+    D -> E F
+    E -> g | epsilon
+    F -> f | epsilon

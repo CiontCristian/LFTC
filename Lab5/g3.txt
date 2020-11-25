@@ -1,0 +1,8 @@
+N = S A B C
+E = a b d g h
+S = S
+P =
+    S -> A C B | C b b | B a
+    A -> d a | B C
+    B -> g | epsilon
+    C -> h | epsilon
