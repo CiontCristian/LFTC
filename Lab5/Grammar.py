@@ -14,6 +14,9 @@ class Grammar:
     def getStartingSymbol(self):
         return self.S
 
+    def getProductions(self):
+        return self.P
+
     @staticmethod
     def parseLine(line):
         return line.strip().split(' ')[2:]

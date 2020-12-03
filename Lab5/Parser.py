@@ -1,13 +1,19 @@
 from Grammar import Grammar
+from ParseTable import ParseTable
 
 
 class Parser:
     def __init__(self):
-        self.grammar = Grammar.read("g3.txt")
+        self.grammar = Grammar.read("g5.txt")
         self.firstSet = {}
         self.followSet = {}
         self.populateFirstSet()
         self.populateFollowSet()
+        self.numberedProductions = {}
+        self.parseTable = ParseTable()
+        self.alpha = []
+        self.beta = []
+        self.pi = []
 
     def populateFirstSet(self):
         for nonTerminal in self.grammar.getNonTerminals():
@@ -81,3 +87,127 @@ class Parser:
 
         result = set(result)
         return result
+
+    def numberProductions(self):
+        pos = 1
+        for production in self.grammar.getProductions():
+            startSymbol = production[0]
+            rules = tuple(production[1])
+            # for rule in production[1]:
+            self.numberedProductions[(startSymbol, rules)] = pos
+            pos += 1
+
+    def populateParseTable(self):
+        self.numberProductions()
+
+        self.columnHeader = []
+        self.columnHeader.extend(self.grammar.getTerminals())
+        self.columnHeader.append("$")
+
+        self.parseTable.put(("$", "$"), (["acc"], -1))
+        for terminal in self.grammar.getTerminals():
+            self.parseTable.put((terminal, terminal), (["pop"], -1))
+
+        for key, value in self.numberedProductions.items():
+            startSymbol = key[0]
+            rules = key[1]
+            pos = value
+
+            tableValue = (rules, pos)
+            for symbol in self.columnHeader:
+                tableKey = (startSymbol, symbol)
+
+                if rules[0] == symbol and symbol != "epsilon":
+                    self.parseTable.put(tableKey, tableValue)
+
+                elif rules[0] in self.grammar.getNonTerminals() and symbol in self.firstSet[rules[0]]:
+                    if not self.parseTable.containsKey(tableKey):
+                        self.parseTable.put(tableKey, tableValue)
+                else:
+                    if rules[0] == "epsilon":
+                        for b in self.followSet[startSymbol]:
+                            self.parseTable.put((startSymbol, b), tableValue)
+                    else:
+                        firsts = []
+                        for rule in rules:
+                            if rule in self.grammar.getNonTerminals():
+                                firsts.extend(self.firstSet[rule])
+                        firsts = set(firsts)
+                        if "epsilon" in firsts:
+                            for b in self.firstSet[startSymbol]:
+                                if b == "epsilon":
+                                    b = "$"
+                                tableKey = (startSymbol, b)
+                                if not self.parseTable.containsKey(tableKey):
+                                    self.parseTable.put(tableKey, tableValue)
+
+    def parse(self, w):
+        self.alpha.clear()
+        self.alpha.append("$")
+        for char in reversed(w):
+            self.alpha.append(char)
+
+        self.beta.clear()
+        self.beta.append("$")
+        self.beta.append(self.grammar.getStartingSymbol())
+
+        self.pi.clear()
+        self.pi.append("epsilon")
+
+        go = True
+        status = True
+
+        while go:
+            alphaTop = self.alpha[-1]
+            betaTop = self.beta[-1]
+
+            if alphaTop == "$" and betaTop == "$":
+                return status
+
+            parseTableValue = self.parseTable.getKeyValue((betaTop, alphaTop))
+
+            if parseTableValue is None:
+                go = False
+                status = False
+            else:
+                rules = parseTableValue[0]
+                index = parseTableValue[1]
+
+                if index == -1 and rules[0] == "acc":
+                    go = False
+                    status = True
+                elif index == -1 and rules[0] == "pop":
+                    self.alpha.pop()
+                    self.beta.pop()
+                else:
+                    self.beta.pop()
+                    if not rules[0] == "epsilon":
+                        for char in reversed(rules):
+                            self.beta.append(char)
+                    self.pi.append(str(index))
+
+        return status
+
+    def parseResult(self, w):
+        status = self.parse(w)
+        if status:
+            print("Sequence " + str(w) + " is accepted")
+            print("Pi: " + str(self.pi))
+            print("Derivation String: " + self.derivationString())
+        else:
+            print("Sequence " + str(w) + " is not accepted")
+
+    def derivationString(self):
+        str_builder = ""
+        for index in self.pi:
+            if index == "epsilon":
+                continue
+
+            for key, value in self.numberedProductions.items():
+                if index == str(value):
+                    x = ""
+                    for i in key[1]:
+                        x += i
+                    str_builder += str(value) + ": " + str(key[0]) + " -> " + str(x) + "\n"
+
+        return str_builder
