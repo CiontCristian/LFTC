@@ -27,7 +27,7 @@ class ParseTable:
             currentValue = self.table[currentKey]
             x = ""
             for i in currentValue[0]:
-                x += i
+                x += i + " "
             str_builder += "M[" + str(currentKey[0]) + "," + str(currentKey[1]) + "] = [" + str(x) + "," + str(currentValue[
                 1]) + "]\n"
 

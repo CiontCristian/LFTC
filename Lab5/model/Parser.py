@@ -1,10 +1,10 @@
-from Grammar import Grammar
-from ParseTable import ParseTable
+from model.Grammar import Grammar
+from model.ParseTable import ParseTable
 
 
 class Parser:
-    def __init__(self):
-        self.grammar = Grammar.read("g5.txt")
+    def __init__(self, fileName):
+        self.grammar = Grammar.read(fileName)
         self.firstSet = {}
         self.followSet = {}
         self.populateFirstSet()
@@ -115,10 +115,12 @@ class Parser:
 
             tableValue = (rules, pos)
             for symbol in self.columnHeader:
+
                 tableKey = (startSymbol, symbol)
 
                 if rules[0] == symbol and symbol != "epsilon":
-                    self.parseTable.put(tableKey, tableValue)
+                    if not self.parseTable.containsKey(tableKey):
+                        self.parseTable.put(tableKey, tableValue)
 
                 elif rules[0] in self.grammar.getNonTerminals() and symbol in self.firstSet[rules[0]]:
                     if not self.parseTable.containsKey(tableKey):
@@ -126,7 +128,8 @@ class Parser:
                 else:
                     if rules[0] == "epsilon":
                         for b in self.followSet[startSymbol]:
-                            self.parseTable.put((startSymbol, b), tableValue)
+                            if not self.parseTable.containsKey((startSymbol, b)):
+                                self.parseTable.put((startSymbol, b), tableValue)
                     else:
                         firsts = []
                         for rule in rules:
@@ -156,15 +159,19 @@ class Parser:
 
         go = True
         status = True
+        errorIndex = 0
 
         while go:
             alphaTop = self.alpha[-1]
             betaTop = self.beta[-1]
+            print(self.alpha)
+            print(self.beta)
 
             if alphaTop == "$" and betaTop == "$":
-                return status
+                return status, errorIndex
 
-            parseTableValue = self.parseTable.getKeyValue((betaTop, alphaTop))
+            parseTableValue = self.parseTable.getKeyValue((betaTop, str(alphaTop)))
+            print(parseTableValue)
 
             if parseTableValue is None:
                 go = False
@@ -179,6 +186,7 @@ class Parser:
                 elif index == -1 and rules[0] == "pop":
                     self.alpha.pop()
                     self.beta.pop()
+                    errorIndex += 1
                 else:
                     self.beta.pop()
                     if not rules[0] == "epsilon":
@@ -186,28 +194,4 @@ class Parser:
                             self.beta.append(char)
                     self.pi.append(str(index))
 
-        return status
-
-    def parseResult(self, w):
-        status = self.parse(w)
-        if status:
-            print("Sequence " + str(w) + " is accepted")
-            print("Pi: " + str(self.pi))
-            print("Derivation String: " + self.derivationString())
-        else:
-            print("Sequence " + str(w) + " is not accepted")
-
-    def derivationString(self):
-        str_builder = ""
-        for index in self.pi:
-            if index == "epsilon":
-                continue
-
-            for key, value in self.numberedProductions.items():
-                if index == str(value):
-                    x = ""
-                    for i in key[1]:
-                        x += i
-                    str_builder += str(value) + ": " + str(key[0]) + " -> " + str(x) + "\n"
-
-        return str_builder
+        return status, errorIndex
