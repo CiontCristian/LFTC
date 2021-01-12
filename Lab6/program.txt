@@ -1,0 +1,28 @@
+function main(){
+	Number nr;
+	Number k;
+	k:=3;
+	Bool isPrime;
+
+	readln(nr);
+
+	if(nr < 2 or nr == 4){
+		isPrime := false;
+		yield isPrime;
+	}
+
+	nr := nr div 2;
+    Number aux;
+	while(k < nr){
+		aux := nr mod k;
+		if(aux == 0){
+			isPrime := false;
+			yield isPrime;
+		}
+		k := k + 1;
+	}
+
+	isPrime := true;
+	yield isPrime;
+
+}
